@@ -1,7 +1,6 @@
 import React from 'react';
 import { differenceInDays, parseISO } from 'date-fns';
 import { Download, AlertCircle, Edit, Trash2 } from 'lucide-react';
-import '../styles/AdminPanel.css';
 
 const CertTable = ({ certifications, isAdmin = false, onDelete }) => {
     if (!certifications || certifications.length === 0) {

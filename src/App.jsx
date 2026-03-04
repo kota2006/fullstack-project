@@ -1,7 +1,8 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import './styles/SpatialGlass.css';
 
 // Components
 import Navbar from './components/Navbar';
@@ -11,6 +12,15 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import AdminPanel from './pages/AdminPanel';
 import Profile from './pages/Profile';
+
+// Data Stream Overlay (shared)
+export const DataStreamOverlay = () => (
+  <div className="data-stream-overlay">
+    {[...Array(10)].map((_, i) => (
+      <div key={i} className="data-stream-particle" />
+    ))}
+  </div>
+);
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children, allowedRole }) => {
@@ -28,57 +38,54 @@ const ProtectedRoute = ({ children, allowedRole }) => {
 };
 
 const AppContent = () => {
-  const location = useLocation();
-  const isAdminRoute = location.pathname === '/admin';
-
   return (
-    <div className={`min-h-screen font-sans ${isAdminRoute ? '' : 'bg-gray-50'}`}
-      style={isAdminRoute ? { background: '#07070A' } : {}}
-    >
+    <div className="spatial-app-root">
+      <div className="spatial-bg" />
+      <DataStreamOverlay />
       <Navbar />
-      <main className={isAdminRoute ? '' : 'max-w-7xl mx-auto py-6 sm:px-6 lg:px-8'}>
-        <Routes>
-          <Route path="/login" element={<Login />} />
+      <Routes>
+        <Route path="/login" element={<Login />} />
 
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute allowedRole="user">
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute allowedRole="user">
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
 
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute allowedRole="admin">
-                <AdminPanel />
-              </ProtectedRoute>
-            }
-          />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute allowedRole="admin">
+              <AdminPanel />
+            </ProtectedRoute>
+          }
+        />
 
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            }
-          />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
 
-          {/* Default Route */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
-      </main>
+        {/* Default Route */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
       <Toaster
         position="top-right"
         toastOptions={{
           duration: 3000,
           style: {
-            background: '#363636',
-            color: '#fff',
+            background: 'rgba(15, 15, 25, 0.9)',
+            color: '#e8eaf6',
+            border: '1px solid rgba(0, 255, 255, 0.15)',
+            backdropFilter: 'blur(10px)',
           }
         }}
       />

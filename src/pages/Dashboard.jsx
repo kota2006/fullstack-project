@@ -4,7 +4,7 @@ import { api } from '../services/api';
 import CertCard from '../components/CertCard';
 import CertTable from '../components/CertTable';
 import AddCertForm from '../components/AddCertForm';
-import { LayoutGrid, List, Plus } from 'lucide-react';
+import { LayoutGrid, List, Plus, Award } from 'lucide-react';
 
 const Dashboard = () => {
     const { user } = useAuth();
@@ -36,68 +36,76 @@ const Dashboard = () => {
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-agri-600"></div>
+            <div className="spatial-content">
+                <div className="spatial-loader">
+                    <div className="spatial-spinner"></div>
+                </div>
             </div>
         );
     }
 
     return (
-        <div>
-            <div className="md:flex md:items-center md:justify-between mb-6">
-                <div className="flex-1 min-w-0">
-                    <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
-                        My Certifications
-                    </h2>
-                </div>
-                <div className="mt-4 flex md:mt-0 md:ml-4 space-x-3">
-                    <div className="inline-flex rounded-md shadow-sm">
+        <div className="spatial-content">
+            {/* Header Zone */}
+            <div className="spatial-header-zone animate-panel-in">
+                <h2 className="spatial-page-title">My Certifications</h2>
+                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                    {/* View Toggle */}
+                    <div className="view-toggle-group">
                         <button
                             onClick={() => setViewMode('grid')}
-                            className={`relative inline-flex items-center px-4 py-2 rounded-l-md border border-gray-300 text-sm font-medium ${viewMode === 'grid' ? 'bg-agri-50 text-agri-700 z-10' : 'bg-white text-gray-700 hover:bg-gray-50'
-                                }`}
+                            className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
+                            id="view-grid-btn"
                         >
-                            <LayoutGrid className="w-4 h-4 mr-2" />
+                            <LayoutGrid size={14} />
                             Grid
                         </button>
                         <button
                             onClick={() => setViewMode('table')}
-                            className={`relative inline-flex items-center px-4 py-2 rounded-r-md border border-l-0 border-gray-300 text-sm font-medium ${viewMode === 'table' ? 'bg-agri-50 text-agri-700 z-10' : 'bg-white text-gray-700 hover:bg-gray-50'
-                                }`}
+                            className={`view-toggle-btn ${viewMode === 'table' ? 'active' : ''}`}
+                            id="view-table-btn"
                         >
-                            <List className="w-4 h-4 mr-2" />
+                            <List size={14} />
                             Table
                         </button>
                     </div>
+
                     <button
                         onClick={() => setShowAddForm(!showAddForm)}
-                        className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-agri-600 hover:bg-agri-700"
+                        className="prism-button prism-button-cyan"
+                        id="add-cert-btn"
                     >
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add New
+                        <Plus size={14} />
+                        <span>Add New</span>
                     </button>
                 </div>
             </div>
 
+            {/* Add Form */}
             {showAddForm && (
-                <div className="mb-8">
+                <div className="animate-panel-in delay-1">
                     <AddCertForm onSuccess={handleAddSuccess} onCancel={() => setShowAddForm(false)} />
                 </div>
             )}
 
+            {/* Content */}
             {viewMode === 'grid' ? (
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="cert-grid-cards animate-panel-in delay-2">
                     {certifications.map((cert) => (
                         <CertCard key={cert.id} cert={cert} />
                     ))}
                     {certifications.length === 0 && (
-                        <div className="col-span-full text-center py-12 bg-white rounded-lg border border-gray-200 shadow-sm">
-                            <p className="text-gray-500">No certifications found. Add one to get started!</p>
+                        <div className="empty-state-spatial" style={{ gridColumn: '1 / -1' }}>
+                            <Award size={48} className="empty-icon" />
+                            <h3>No Certifications Found</h3>
+                            <p>Get started by adding a new certification.</p>
                         </div>
                     )}
                 </div>
             ) : (
-                <CertTable certifications={certifications} />
+                <div className="cert-data-grid glass-panel animate-panel-in delay-2">
+                    <CertTable certifications={certifications} />
+                </div>
             )}
         </div>
     );

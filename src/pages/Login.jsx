@@ -3,17 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 import toast from 'react-hot-toast';
-import { Award } from 'lucide-react';
+import { Award, Lock, Mail } from 'lucide-react';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [role, setRole] = useState('user'); // Default to user login preview
+    const [role, setRole] = useState('user');
     const [loading, setLoading] = useState(false);
     const { login } = useAuth();
     const navigate = useNavigate();
 
-    // Helper for demo purposes
     const fillDemoData = (demoRole) => {
         if (demoRole === 'admin') {
             setEmail('admin@certapp.com');
@@ -47,45 +46,54 @@ const Login = () => {
     };
 
     return (
-        <div className="min-h-screen bg-agri-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-            <div className="sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="flex justify-center">
-                    <Award className="h-16 w-16 text-agri-600" />
+        <div className="login-spatial-root">
+            <div className="login-container animate-panel-in">
+                {/* Logo Section */}
+                <div className="login-logo-section">
+                    <div className="login-logo-icon">
+                        <Award size={32} />
+                    </div>
+                    <h1 className="login-title">CertTrack</h1>
+                    <p className="login-subtitle">Professional Skill Certification Tracking</p>
                 </div>
-                <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                    Sign in to your account
-                </h2>
-                <p className="mt-2 text-center text-sm text-gray-600">
-                    Professional Skill Certification Tracking
-                </p>
-            </div>
 
-            <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 border border-agri-100">
-
-                    <div className="mb-6 flex gap-2">
+                {/* Login Card */}
+                <div className="login-card animate-panel-in delay-2">
+                    {/* Role Toggle */}
+                    <div className="role-toggle-group">
                         <button
                             type="button"
                             onClick={() => fillDemoData('user')}
-                            className={`flex-1 py-2 px-4 border rounded-md text-sm font-medium ${role === 'user' ? 'bg-agri-50 border-agri-500 text-agri-700' : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'}`}
+                            className={`role-toggle-btn ${role === 'user' ? 'active' : ''}`}
+                            id="demo-student-btn"
                         >
                             Student Demo
                         </button>
                         <button
                             type="button"
                             onClick={() => fillDemoData('admin')}
-                            className={`flex-1 py-2 px-4 border rounded-md text-sm font-medium ${role === 'admin' ? 'bg-agri-50 border-agri-500 text-agri-700' : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'}`}
+                            className={`role-toggle-btn ${role === 'admin' ? 'active' : ''}`}
+                            id="demo-admin-btn"
                         >
                             Admin Demo
                         </button>
                     </div>
 
-                    <form className="space-y-6" onSubmit={handleSubmit}>
-                        <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                                Email address
+                    {/* Form */}
+                    <form onSubmit={handleSubmit}>
+                        <div className="glass-form-group">
+                            <label htmlFor="email" className="glass-form-label">
+                                Email Address
                             </label>
-                            <div className="mt-1">
+                            <div style={{ position: 'relative' }}>
+                                <Mail size={16} style={{
+                                    position: 'absolute',
+                                    left: '12px',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    color: 'rgba(160,170,190,0.4)',
+                                    pointerEvents: 'none'
+                                }} />
                                 <input
                                     id="email"
                                     name="email"
@@ -94,16 +102,26 @@ const Login = () => {
                                     required
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-agri-500 focus:border-agri-500 sm:text-sm"
+                                    className="glass-form-input"
+                                    style={{ paddingLeft: '2.5rem' }}
+                                    placeholder="Enter your email"
                                 />
                             </div>
                         </div>
 
-                        <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                        <div className="glass-form-group">
+                            <label htmlFor="password" className="glass-form-label">
                                 Password
                             </label>
-                            <div className="mt-1">
+                            <div style={{ position: 'relative' }}>
+                                <Lock size={16} style={{
+                                    position: 'absolute',
+                                    left: '12px',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    color: 'rgba(160,170,190,0.4)',
+                                    pointerEvents: 'none'
+                                }} />
                                 <input
                                     id="password"
                                     name="password"
@@ -112,20 +130,22 @@ const Login = () => {
                                     required
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-agri-500 focus:border-agri-500 sm:text-sm"
+                                    className="glass-form-input"
+                                    style={{ paddingLeft: '2.5rem' }}
+                                    placeholder="Enter your password"
                                 />
                             </div>
                         </div>
 
-                        <div>
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-agri-600 hover:bg-agri-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-agri-500 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
-                            >
-                                {loading ? 'Signing in...' : 'Sign in'}
-                            </button>
-                        </div>
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="prism-button prism-button-cyan"
+                            style={{ width: '100%', justifyContent: 'center', marginTop: '0.5rem' }}
+                            id="login-submit-btn"
+                        >
+                            <span>{loading ? 'Authenticating...' : 'Sign In'}</span>
+                        </button>
                     </form>
                 </div>
             </div>
