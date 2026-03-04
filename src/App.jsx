@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
@@ -28,10 +28,15 @@ const ProtectedRoute = ({ children, allowedRole }) => {
 };
 
 const AppContent = () => {
+  const location = useLocation();
+  const isAdminRoute = location.pathname === '/admin';
+
   return (
-    <div className="min-h-screen bg-gray-50 font-sans">
+    <div className={`min-h-screen font-sans ${isAdminRoute ? '' : 'bg-gray-50'}`}
+      style={isAdminRoute ? { background: '#07070A' } : {}}
+    >
       <Navbar />
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+      <main className={isAdminRoute ? '' : 'max-w-7xl mx-auto py-6 sm:px-6 lg:px-8'}>
         <Routes>
           <Route path="/login" element={<Login />} />
 
