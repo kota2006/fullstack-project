@@ -16,7 +16,7 @@ const Dashboard = () => {
     const fetchCerts = async () => {
         setLoading(true);
         try {
-            const data = await api.getCertifications(user.id);
+            const data = await api.getCertifications();
             setCertifications(data);
         } catch (error) {
             console.error(error);

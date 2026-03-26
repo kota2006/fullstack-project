@@ -1,79 +1,102 @@
-import { initializeData } from '../data/mockCertifications';
+const API_BASE = 'http://localhost:5000/api';
 
-// Initialize mock data in local storage
-initializeData();
+// Helper to get auth token
+const getToken = () => localStorage.getItem('cert_app_token');
 
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+// Helper for API requests
+const request = async (endpoint, options = {}) => {
+    const token = getToken();
+    const config = {
+        headers: {
+            'Content-Type': 'application/json',
+            ...(token && { Authorization: `Bearer ${token}` }),
+            ...options.headers
+        },
+        ...options
+    };
+
+    const response = await fetch(`${API_BASE}${endpoint}`, config);
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || 'Something went wrong');
+    }
+
+    return data;
+};
 
 export const api = {
-    // Auth
+    // ─── Auth ────────────────────────────────────────────────
     login: async (email, password) => {
-        await delay(500); // Simulate network latency
-        const users = JSON.parse(localStorage.getItem('cert_app_users') || '[]');
-        const user = users.find((u) => u.email === email && u.password === password);
-        if (!user) throw new Error('Invalid credentials');
-
-        // Don't leak password
-        const { password: _, ...userWithoutPassword } = user;
-        return userWithoutPassword;
+        const data = await request('/auth/login', {
+            method: 'POST',
+            body: JSON.stringify({ email, password })
+        });
+        // Store token
+        localStorage.setItem('cert_app_token', data.token);
+        return data.user;
     },
 
-    // Users
+    register: async (name, email, password) => {
+        const data = await request('/auth/register', {
+            method: 'POST',
+            body: JSON.stringify({ name, email, password })
+        });
+        localStorage.setItem('cert_app_token', data.token);
+        return data.user;
+    },
+
+    getMe: async () => {
+        const data = await request('/auth/me');
+        return data.user;
+    },
+
+    logout: () => {
+        localStorage.removeItem('cert_app_token');
+        localStorage.removeItem('cert_app_user');
+    },
+
+    // ─── Users ───────────────────────────────────────────────
     getUsers: async () => {
-        await delay(300);
-        return JSON.parse(localStorage.getItem('cert_app_users') || '[]');
+        const data = await request('/users');
+        return data.users;
     },
 
-    updateUser: async (id, data) => {
-        await delay(300);
-        const users = JSON.parse(localStorage.getItem('cert_app_users') || '[]');
-        const index = users.findIndex((u) => u.id === id);
-        if (index === -1) throw new Error('User not found');
-
-        users[index] = { ...users[index], ...data };
-        localStorage.setItem('cert_app_users', JSON.stringify(users));
-        return users[index];
+    updateUser: async (id, userData) => {
+        const data = await request(`/users/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(userData)
+        });
+        return data.user;
     },
 
-    // Certifications
+    // ─── Certifications ──────────────────────────────────────
     getCertifications: async (userId = null) => {
-        await delay(400);
-        const certs = JSON.parse(localStorage.getItem('cert_app_certs') || '[]');
-        if (userId) {
-            return certs.filter((c) => c.userId === userId);
-        }
-        return certs;
+        const query = userId ? `?userId=${userId}` : '';
+        const data = await request(`/certifications${query}`);
+        return data.certifications;
     },
 
     addCertification: async (certData) => {
-        await delay(600);
-        const certs = JSON.parse(localStorage.getItem('cert_app_certs') || '[]');
-        const newCert = {
-            ...certData,
-            id: `c${Date.now()}`,
-            status: 'active' // Simplified status logic for mock
-        };
-        certs.push(newCert);
-        localStorage.setItem('cert_app_certs', JSON.stringify(certs));
-        return newCert;
+        const data = await request('/certifications', {
+            method: 'POST',
+            body: JSON.stringify(certData)
+        });
+        return data.certification;
     },
 
-    updateCertification: async (id, data) => {
-        await delay(400);
-        const certs = JSON.parse(localStorage.getItem('cert_app_certs') || '[]');
-        const index = certs.findIndex((c) => c.id === id);
-        if (index === -1) throw new Error('Certification not found');
-
-        certs[index] = { ...certs[index], ...data };
-        localStorage.setItem('cert_app_certs', JSON.stringify(certs));
-        return certs[index];
+    updateCertification: async (id, certData) => {
+        const data = await request(`/certifications/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(certData)
+        });
+        return data.certification;
     },
 
     deleteCertification: async (id) => {
-        await delay(400);
-        const certs = JSON.parse(localStorage.getItem('cert_app_certs') || '[]');
-        const filtered = certs.filter((c) => c.id !== id);
-        localStorage.setItem('cert_app_certs', JSON.stringify(filtered));
+        await request(`/certifications/${id}`, {
+            method: 'DELETE'
+        });
         return true;
     }
 };
